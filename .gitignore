@@ -1,0 +1,19 @@
+# Editors
+.idea/
+.vscode/
+*.iml
+
+# Node.js
+node_modules/
+
+# Build artifacts
+main.js
+*.map
+coverage/
+
+# Obsidian runtime data
+data.json
+.env.local
+
+# macOS
+.DS_Store

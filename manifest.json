@@ -1,0 +1,10 @@
+{
+  "id": "lab829-ai-summary",
+  "name": "AI Summary",
+  "version": "0.1.0",
+  "minAppVersion": "1.8.10",
+  "description": "Adds an AI-generated summary and key takeaways to notes marked ai_summary: pending, using your own Gemini or OpenAI API key.",
+  "author": "Julian Pineda",
+  "authorUrl": "https://github.com/julianpinedayyz",
+  "isDesktopOnly": true
+}
