@@ -47,7 +47,7 @@ pnpm build
 Optional dev shortcut:
 
 1. Copy `.env.local.example` to `.env.local`
-2. Set `OBSIDIAN_PLUGIN_DIR` to your local vault plugin folder, for example `<vault>/.obsidian/plugins/lab829-ai-summary/`
+2. Set `OBSIDIAN_PLUGIN_DIR` to your local vault plugin folder, for example `<vault>/.obsidian/plugins/lab-ai-summary/`
 3. Run `pnpm build:sync`
 
 That will build the plugin and copy `main.js`, `manifest.json`, and `styles.css` into the plugin folder automatically.
@@ -67,7 +67,7 @@ If `.obsidian` is hidden on macOS, press `Command + Shift + .` in Finder to show
 Create this folder inside your vault:
 
 ```text
-.obsidian/plugins/lab829-ai-summary/
+.obsidian/plugins/lab-ai-summary/
 ```
 
 ### Step 4 — Copy the built plugin files
@@ -81,7 +81,7 @@ Copy these files from this repository:
 into:
 
 ```text
-<your-vault>/.obsidian/plugins/lab829-ai-summary/
+<your-vault>/.obsidian/plugins/lab-ai-summary/
 ```
 
 If you used `pnpm build:sync`, this copy step was already done for you.

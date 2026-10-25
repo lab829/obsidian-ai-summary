@@ -26,6 +26,11 @@
 - **Settings contract alignment** — removed unsupported prompt and frontmatter controls from settings and aligned the UI with the locked MVP enrichment flow.
 - **Summary output contract** — clarified that successful enrichment inserts a formatted block at the top of the note body and updates frontmatter from `ai_summary: pending` to `ai_summary: generated`.
 
+## 0.1.1 - 2026-10-25
+
+### Changed
+- **Plugin ID** — renamed from `lab829-ai-summary` to `lab-ai-summary` to meet the Obsidian community directory ID rules (lowercase letters and hyphens only).
+
 ## 0.1.0 - 2026-03-28
 
 - Scaffolded the official-style Obsidian plugin foundation with TypeScript, esbuild, ESLint, Vitest, and pnpm enforcement.

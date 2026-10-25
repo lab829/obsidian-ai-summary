@@ -21,7 +21,7 @@ Once the plugin is approved in the Obsidian Community Plugins directory, install
 ### Manual install from GitHub releases
 
 1. Download `manifest.json`, `main.js`, and `styles.css` from the latest release.
-2. Copy them into `<vault>/.obsidian/plugins/lab829-ai-summary/`.
+2. Copy them into `<vault>/.obsidian/plugins/lab-ai-summary/`.
 3. Reload Obsidian and enable the plugin.
 
 ## Setup
@@ -64,7 +64,7 @@ What is sent: the body of the pending note (everything below the YAML frontmatte
 ### Your own API key
 
 - You must supply your own Gemini or OpenAI API key. The plugin does not provide one and does not require an account with Lab829.
-- The key is stored in this plugin's settings file in your vault (`<vault>/.obsidian/plugins/lab829-ai-summary/data.json`) in plain text, like other Obsidian plugin settings. Do not sync or share that file if you don't want to share the key.
+- The key is stored in this plugin's settings file in your vault (`<vault>/.obsidian/plugins/lab-ai-summary/data.json`) in plain text, like other Obsidian plugin settings. Do not sync or share that file if you don't want to share the key.
 - The key is sent only to the provider you selected: as a `Bearer` authorization header for OpenAI, and as the `key` query parameter for Gemini (Google's documented API format). It is never sent to Lab829 or any other server.
 
 ### Paid features
@@ -91,7 +91,7 @@ pnpm build
 If you want to test the built plugin locally inside a vault:
 
 1. Copy `.env.local.example` to `.env.local`.
-2. Set `OBSIDIAN_PLUGIN_DIR` to `<vault>/.obsidian/plugins/lab829-ai-summary/`.
+2. Set `OBSIDIAN_PLUGIN_DIR` to `<vault>/.obsidian/plugins/lab-ai-summary/`.
 3. Run `pnpm build:sync`.
 
 ## Contributing
