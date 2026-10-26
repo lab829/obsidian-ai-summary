@@ -1,11 +1,11 @@
-/* eslint-disable obsidianmd/ui/sentence-case */
 import { PluginSettingTab, Setting } from "obsidian";
 
 import type ObsidianAiSummaryPlugin from "../../../main";
 import {
-  discoverConfiguredProviderModels,
+  discoverProviderModels,
   type ProviderModelOption
 } from "../../enrichment/services/providers";
+import { formatProviderLabel } from "../services/plugin-settings";
 
 export class AiSummarySettingTab extends PluginSettingTab {
   private modelSettingRenderId = 0;
@@ -24,14 +24,14 @@ export class AiSummarySettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("How it works")
       .setDesc(
-        "The plugin only processes notes whose frontmatter contains ai_summary: pending."
+        "The plugin only processes notes whose frontmatter marks the summary as pending."
       )
       .setHeading();
 
     new Setting(containerEl)
       .setName("Locked workflow contract")
       .setDesc(
-        "Successful processing inserts a formatted enrichment block at the top of the note body and flips ai_summary to generated. Prompt wording is configurable, but the note-state workflow is fixed."
+        "Successful processing inserts a formatted enrichment block at the top of the note body and marks the summary as generated. Prompt wording is configurable, but the note-state workflow is fixed."
       );
 
     new Setting(containerEl)
@@ -50,7 +50,7 @@ export class AiSummarySettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("API key")
-      .setDesc("Stored in plugin data on this device. Never proxied through a Lab829 service.")
+      .setDesc("Stored in plugin data on this device. Sent only to your selected provider.")
       .addText((text) => {
         text
           .setPlaceholder("Paste your provider API key")
@@ -88,7 +88,7 @@ export class AiSummarySettingTab extends PluginSettingTab {
       .addTextArea((textArea) => {
         textArea
           .setPlaceholder(
-            "Return 3-5 markdown bullet lines (- item) with the most actionable insights from this page."
+            "Return 3-5 Markdown bullet lines (- item) with the most actionable insights from this page."
           )
           .setValue(this.plugin.settings.takeawaysPrompt)
           .onChange(async (value) => {
@@ -130,7 +130,7 @@ export class AiSummarySettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Still not supported")
       .setDesc(
-        "v1 still does not support custom frontmatter keys, custom pending values, custom fields, or multi-field enrichment templates. Only the wording of the existing summary and takeaway prompts is configurable."
+        "This version does not support custom frontmatter keys, custom pending values, custom fields, or multi-field enrichment templates. Only the wording of the existing summary and takeaway prompts is configurable."
       );
   }
 
@@ -155,7 +155,7 @@ export class AiSummarySettingTab extends PluginSettingTab {
       .setDesc(`Loading available ${formatProviderLabel(this.plugin.settings.provider)} models...`);
 
     try {
-      const options = await discoverConfiguredProviderModels({
+      const options = await discoverProviderModels({
         provider: this.plugin.settings.provider,
         apiKey
       });
@@ -208,7 +208,7 @@ export class AiSummarySettingTab extends PluginSettingTab {
         }
 
         dropdown
-          .setValue(hasCurrentModel ? currentModel : currentModel || "")
+          .setValue(currentModel)
           .onChange(async (value) => {
             await this.plugin.updateSetting("model", value.trim());
           });
@@ -226,7 +226,7 @@ export class AiSummarySettingTab extends PluginSettingTab {
       .setDesc(description)
       .addText((text) => {
         text
-          .setPlaceholder("e.g. gemini-2.5-flash or gpt-4.1-mini")
+          .setPlaceholder("Model ID from your provider")
           .setValue(this.plugin.settings.model)
           .onChange(async (value) => {
             await this.plugin.updateSetting("model", value.trim());
@@ -240,8 +240,4 @@ export class AiSummarySettingTab extends PluginSettingTab {
   ): boolean {
     return containerEl.isConnected && renderId === this.modelSettingRenderId;
   }
-}
-
-function formatProviderLabel(provider: "gemini" | "openai"): string {
-  return provider === "openai" ? "OpenAI" : "Gemini";
 }

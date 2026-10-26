@@ -1,4 +1,7 @@
-import type { AiSummaryPluginSettings } from "../../settings/services/plugin-settings";
+import {
+  formatProviderLabel,
+  type AiSummaryPluginSettings
+} from "../../settings/services/plugin-settings";
 import type { SettingsValidationFailure } from "../../settings/services/settings-validation";
 import { validateRuntimeSettings } from "../../settings/services/settings-validation";
 import type { EnrichmentResult } from "../types/enrichment-result";
@@ -169,7 +172,8 @@ export async function processPendingNote(
       enrichmentResult
     };
   } catch (error) {
-    const errorCode = isWriteFailure(error) ? "write-failed" : "provider-failed";
+    const writeFailed = error instanceof ProcessPendingNoteWriteError;
+    const errorCode = writeFailed ? "write-failed" : "provider-failed";
 
     return {
       status: "failed",
@@ -179,7 +183,7 @@ export async function processPendingNote(
         errorCode === "write-failed"
           ? "AI summary was generated, but the note could not be updated."
           : `AI summary failed with the configured ${formatProviderLabel(settings.provider)} provider.`,
-      cause: unwrapFailureCause(error)
+      cause: writeFailed ? error.cause : error
     };
   }
 }
@@ -229,16 +233,4 @@ function removeLeadingEnrichmentBlock(body: string): string {
   const remainingBody = trimmedBody.slice(match[0].length);
 
   return remainingBody.replace(/^\n+/, "");
-}
-
-function formatProviderLabel(provider: RuntimeSettings["provider"]): string {
-  return provider === "openai" ? "OpenAI" : "Gemini";
-}
-
-function isWriteFailure(error: unknown): error is ProcessPendingNoteWriteError {
-  return error instanceof ProcessPendingNoteWriteError;
-}
-
-function unwrapFailureCause(error: unknown): unknown {
-  return isWriteFailure(error) ? error.cause : error;
 }

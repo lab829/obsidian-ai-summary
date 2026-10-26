@@ -1,6 +1,6 @@
 import esbuild from "esbuild";
 import process from "node:process";
-import builtins from "builtin-modules";
+import { builtinModules } from "node:module";
 
 const production = process.argv[2] === "production";
 const banner =
@@ -12,7 +12,7 @@ const context = await esbuild.context({
   },
   bundle: true,
   entryPoints: ["src/main.ts"],
-  external: ["obsidian", "electron", ...builtins],
+  external: ["obsidian", "electron", ...builtinModules],
   format: "cjs",
   logLevel: "info",
   outfile: "main.js",

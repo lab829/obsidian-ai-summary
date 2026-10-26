@@ -26,6 +26,16 @@
 - **Settings contract alignment** — removed unsupported prompt and frontmatter controls from settings and aligned the UI with the locked MVP enrichment flow.
 - **Summary output contract** — clarified that successful enrichment inserts a formatted block at the top of the note body and updates frontmatter from `ai_summary: pending` to `ai_summary: generated`.
 
+## 0.1.2 - 2026-10-26
+
+### Fixed
+- **Obsidian review lint** — removed the `obsidianmd/ui/sentence-case` disable and rewrote settings text in sentence case; upgraded `eslint-plugin-obsidianmd` to 0.4.2 so local lint matches the community review.
+- **Popout window compatibility** — timers and `fetch` use `window` instead of `globalThis`.
+- **Startup vault scan** — vault listeners and the pending-note scan now start after layout ready, and the scan skips notes the metadata cache already shows are not pending.
+
+### Changed
+- **Leaner source** — replaced `builtin-modules` with `node:module`, removed unused helpers and wrappers, and shared the provider label and prompt builders.
+
 ## 0.1.1 - 2026-10-25
 
 ### Changed

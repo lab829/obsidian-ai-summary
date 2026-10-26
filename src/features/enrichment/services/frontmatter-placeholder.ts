@@ -84,48 +84,6 @@ export function readSummaryPlaceholderState(
   };
 }
 
-export function hasNoneSummaryPlaceholder(
-  noteContent: string,
-  frontmatterKey = DEFAULT_SUMMARY_FRONTMATTER_KEY,
-  noneValue = DEFAULT_NONE_PLACEHOLDER
-): boolean {
-  return readSummaryPlaceholderState(
-    noteContent,
-    frontmatterKey,
-    noneValue
-  ).isNone;
-}
-
-export function hasPendingSummaryPlaceholder(
-  noteContent: string,
-  frontmatterKey = DEFAULT_SUMMARY_FRONTMATTER_KEY,
-  noneValue = DEFAULT_NONE_PLACEHOLDER,
-  pendingValue = DEFAULT_PENDING_PLACEHOLDER
-): boolean {
-  return readSummaryPlaceholderState(
-    noteContent,
-    frontmatterKey,
-    noneValue,
-    pendingValue
-  ).isPending;
-}
-
-export function hasGeneratedSummaryPlaceholder(
-  noteContent: string,
-  frontmatterKey = DEFAULT_SUMMARY_FRONTMATTER_KEY,
-  noneValue = DEFAULT_NONE_PLACEHOLDER,
-  pendingValue = DEFAULT_PENDING_PLACEHOLDER,
-  generatedValue = DEFAULT_GENERATED_PLACEHOLDER
-): boolean {
-  return readSummaryPlaceholderState(
-    noteContent,
-    frontmatterKey,
-    noneValue,
-    pendingValue,
-    generatedValue
-  ).isGenerated;
-}
-
 export function markSummaryPlaceholderAsGenerated(
   noteContent: string,
   frontmatterKey = DEFAULT_SUMMARY_FRONTMATTER_KEY,

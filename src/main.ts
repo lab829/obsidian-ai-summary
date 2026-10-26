@@ -1,6 +1,5 @@
 import { Notice, Plugin, TFile } from "obsidian";
 
-import { applyEnrichmentResultToNote } from "./features/enrichment/services/note-enrichment";
 import {
   DEFAULT_GENERATED_PLACEHOLDER,
   DEFAULT_NONE_PLACEHOLDER,
@@ -10,27 +9,19 @@ import {
   processPendingNote,
   type ProcessPendingNoteResult
 } from "./features/enrichment/services/process-pending-note";
-import type { EnrichmentResult } from "./features/enrichment/types/enrichment-result";
 import {
   DEFAULT_SETTINGS,
   type AiSummaryPluginSettings
 } from "./features/settings/services/plugin-settings";
-import {
-  getSettingsRecoveryRescanAction,
-  type RuntimeSettingsValidationInput
-} from "./features/settings/services/settings-validation";
+import { getSettingsRecoveryRescanAction } from "./features/settings/services/settings-validation";
 import { AiSummarySettingTab } from "./features/settings/ui/AiSummarySettingTab";
 
 export default class ObsidianAiSummaryPlugin extends Plugin {
   settings: AiSummaryPluginSettings = DEFAULT_SETTINGS;
-  private readonly pendingNoteTimers = new Map<
-    string,
-    ReturnType<typeof globalThis.setTimeout>
-  >();
+  private readonly pendingNoteTimers = new Map<string, number>();
   private readonly processingNotePaths = new Set<string>();
   private readonly failureNoticeTimestamps = new Map<string, number>();
-  private settingsRecoveryTimer: ReturnType<typeof globalThis.setTimeout> | null =
-    null;
+  private settingsRecoveryTimer: number | null = null;
 
   override async onload(): Promise<void> {
     await this.loadPluginSettings();
@@ -48,11 +39,14 @@ export default class ObsidianAiSummaryPlugin extends Plugin {
       }
     });
 
-    this.registerVaultListeners();
+    // Vault "create" fires for every file during startup; wait for layout ready.
+    this.app.workspace.onLayoutReady(() => {
+      this.registerVaultListeners();
 
-    if (this.settings.autoProcessNewNotes) {
-      void this.processPendingNotesOnLoad();
-    }
+      if (this.settings.autoProcessNewNotes) {
+        void this.processPendingNotesOnLoad();
+      }
+    });
   }
 
   async updateSetting<Key extends keyof AiSummaryPluginSettings>(
@@ -84,8 +78,8 @@ export default class ObsidianAiSummaryPlugin extends Plugin {
     }
 
     const recoveryAction = getSettingsRecoveryRescanAction(
-      toRuntimeSettingsValidationInput(previousSettings),
-      toRuntimeSettingsValidationInput(this.settings),
+      previousSettings,
+      this.settings,
       this.settingsRecoveryTimer !== null
     );
 
@@ -101,13 +95,6 @@ export default class ObsidianAiSummaryPlugin extends Plugin {
   override onunload(): void {
     this.clearPendingNoteTimers();
     this.clearSettingsRecoveryTimer();
-  }
-
-  applyEnrichmentResult(
-    noteContent: string,
-    enrichmentResult: EnrichmentResult
-  ): string {
-    return applyEnrichmentResultToNote(noteContent, enrichmentResult);
   }
 
   private async loadPluginSettings(): Promise<void> {
@@ -139,10 +126,10 @@ export default class ObsidianAiSummaryPlugin extends Plugin {
     const existingTimer = this.pendingNoteTimers.get(file.path);
 
     if (existingTimer) {
-      globalThis.clearTimeout(existingTimer);
+      window.clearTimeout(existingTimer);
     }
 
-    const timer = globalThis.setTimeout(() => {
+    const timer = window.setTimeout(() => {
       this.pendingNoteTimers.delete(file.path);
       void this.processNotePath(file.path);
     }, this.settings.processingDebounceMs);
@@ -151,7 +138,16 @@ export default class ObsidianAiSummaryPlugin extends Plugin {
   }
 
   private async processPendingNotesOnLoad(): Promise<void> {
+    const { summaryFrontmatterKey, pendingPlaceholderValue } = this.settings;
+
     for (const file of this.app.vault.getMarkdownFiles()) {
+      const cache = this.app.metadataCache.getFileCache(file);
+
+      // Skip notes the metadata cache already knows are not pending.
+      if (cache && cache.frontmatter?.[summaryFrontmatterKey] !== pendingPlaceholderValue) {
+        continue;
+      }
+
       const result = await this.processNotePath(file.path);
 
       if (result?.status === "failed" && result.code === "invalid-settings") {
@@ -217,7 +213,7 @@ export default class ObsidianAiSummaryPlugin extends Plugin {
 
   private clearPendingNoteTimers(): void {
     for (const timer of this.pendingNoteTimers.values()) {
-      globalThis.clearTimeout(timer);
+      window.clearTimeout(timer);
     }
 
     this.pendingNoteTimers.clear();
@@ -226,7 +222,7 @@ export default class ObsidianAiSummaryPlugin extends Plugin {
   private scheduleSettingsRecoveryRescan(): void {
     this.clearSettingsRecoveryTimer();
 
-    this.settingsRecoveryTimer = globalThis.setTimeout(() => {
+    this.settingsRecoveryTimer = window.setTimeout(() => {
       this.settingsRecoveryTimer = null;
       void this.processPendingNotesOnLoad();
     }, this.settings.processingDebounceMs);
@@ -234,18 +230,14 @@ export default class ObsidianAiSummaryPlugin extends Plugin {
 
   private clearSettingsRecoveryTimer(): void {
     if (this.settingsRecoveryTimer) {
-      globalThis.clearTimeout(this.settingsRecoveryTimer);
+      window.clearTimeout(this.settingsRecoveryTimer);
       this.settingsRecoveryTimer = null;
     }
   }
 }
 
 function coercePartialSettings(value: unknown): Partial<AiSummaryPluginSettings> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return {};
-  }
-
-  return value as Partial<AiSummaryPluginSettings>;
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
 }
 
 function isMarkdownFile(file: unknown): file is TFile {
@@ -256,14 +248,4 @@ function isRecoverySettingKey(
   key: keyof AiSummaryPluginSettings
 ): key is "provider" | "apiKey" | "model" {
   return key === "provider" || key === "apiKey" || key === "model";
-}
-
-function toRuntimeSettingsValidationInput(
-  settings: AiSummaryPluginSettings
-): RuntimeSettingsValidationInput {
-  return {
-    provider: settings.provider,
-    apiKey: settings.apiKey,
-    model: settings.model
-  };
 }

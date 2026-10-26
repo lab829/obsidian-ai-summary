@@ -1,9 +1,13 @@
 import { normalizeProviderResponse } from "../response-normalizer";
-import type { ProviderAdapter, ProviderRequest } from "../provider-adapter";
+import {
+  buildProviderPrompt,
+  type ProviderAdapter,
+  type ProviderRequest
+} from "../provider-adapter";
 
 interface GeminiProviderConfig {
   apiKey: string;
-  fetchFn?: typeof globalThis.fetch;
+  fetchFn?: typeof fetch;
 }
 
 interface GeminiGenerateContentResponse {
@@ -42,7 +46,7 @@ async function summarizeWithGemini(
   config: GeminiProviderConfig,
   request: ProviderRequest
 ) {
-  const response = await (config.fetchFn ?? globalThis.fetch)(
+  const response = await (config.fetchFn ?? window.fetch)(
     buildGeminiUrl(request, config.apiKey),
     {
       method: "POST",
@@ -54,7 +58,7 @@ async function summarizeWithGemini(
           {
             parts: [
               {
-                text: buildGeminiPrompt(request)
+                text: buildProviderPrompt(request)
               }
             ]
           }
@@ -89,15 +93,6 @@ async function summarizeWithGemini(
 
 function buildGeminiUrl(request: ProviderRequest, apiKey: string): string {
   return `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(request.model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-}
-
-function buildGeminiPrompt(request: ProviderRequest): string {
-  return [
-    request.promptContract.summaryPrompt,
-    request.promptContract.takeawaysPrompt,
-    "Page content:",
-    request.promptContract.noteBody
-  ].join("\n\n");
 }
 
 function extractCandidateText(

@@ -14,6 +14,15 @@ export interface ProviderAdapter {
   summarize(request: ProviderRequest): Promise<EnrichmentResult>;
 }
 
+export function buildProviderPrompt(request: ProviderRequest): string {
+  return [
+    request.promptContract.summaryPrompt,
+    request.promptContract.takeawaysPrompt,
+    "Page content:",
+    request.promptContract.noteBody
+  ].join("\n\n");
+}
+
 export function buildProviderRequest(summaryJob: SummaryJob): ProviderRequest {
   return {
     model: summaryJob.model,

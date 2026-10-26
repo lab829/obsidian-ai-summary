@@ -1,4 +1,7 @@
-import type { SummaryProvider } from "../../../settings/services/plugin-settings";
+import {
+  formatProviderLabel,
+  type SummaryProvider
+} from "../../../settings/services/plugin-settings";
 
 export interface ProviderModelOption {
   id: string;
@@ -8,7 +11,7 @@ export interface ProviderModelOption {
 export interface ProviderModelDiscoveryInput {
   provider: SummaryProvider;
   apiKey: string;
-  fetchFn?: typeof globalThis.fetch;
+  fetchFn?: typeof fetch;
 }
 
 interface GeminiModelListResponse {
@@ -50,7 +53,7 @@ export async function discoverProviderModels(
     }
 
     throw new ProviderModelDiscoveryError(
-      `${getProviderLabel(input.provider)} model discovery could not reach the provider.`,
+      `${formatProviderLabel(input.provider)} model discovery could not reach the provider.`,
       error
     );
   }
@@ -59,7 +62,7 @@ export async function discoverProviderModels(
 async function discoverGeminiModels(
   input: ProviderModelDiscoveryInput
 ): Promise<ProviderModelOption[]> {
-  const response = await (input.fetchFn ?? globalThis.fetch)(
+  const response = await (input.fetchFn ?? window.fetch)(
     `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(input.apiKey)}`
   );
 
@@ -98,7 +101,7 @@ async function discoverGeminiModels(
 async function discoverOpenAiModels(
   input: ProviderModelDiscoveryInput
 ): Promise<ProviderModelOption[]> {
-  const response = await (input.fetchFn ?? globalThis.fetch)(
+  const response = await (input.fetchFn ?? window.fetch)(
     "https://api.openai.com/v1/models",
     {
       headers: {
@@ -148,8 +151,4 @@ function compareModelOptions(
   right: ProviderModelOption
 ): number {
   return left.label.localeCompare(right.label);
-}
-
-function getProviderLabel(provider: SummaryProvider): string {
-  return provider === "openai" ? "OpenAI" : "Gemini";
 }

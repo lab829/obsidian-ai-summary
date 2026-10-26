@@ -5,6 +5,10 @@ import {
 
 export type SummaryProvider = "gemini" | "openai";
 
+export function formatProviderLabel(provider: SummaryProvider): string {
+  return provider === "openai" ? "OpenAI" : "Gemini";
+}
+
 export const LOCKED_SUMMARY_FRONTMATTER_KEY = "ai_summary";
 export const LOCKED_PENDING_SUMMARY_VALUE = "pending";
 export const LOCKED_GENERATED_SUMMARY_VALUE = "generated";

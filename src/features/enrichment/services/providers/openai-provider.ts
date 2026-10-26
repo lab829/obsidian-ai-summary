@@ -1,9 +1,13 @@
 import { normalizeProviderResponse } from "../response-normalizer";
-import type { ProviderAdapter, ProviderRequest } from "../provider-adapter";
+import {
+  buildProviderPrompt,
+  type ProviderAdapter,
+  type ProviderRequest
+} from "../provider-adapter";
 
 interface OpenAiProviderConfig {
   apiKey: string;
-  fetchFn?: typeof globalThis.fetch;
+  fetchFn?: typeof fetch;
 }
 
 interface OpenAiChatCompletionsResponse {
@@ -45,7 +49,7 @@ async function summarizeWithOpenAi(
   config: OpenAiProviderConfig,
   request: ProviderRequest
 ) {
-  const response = await (config.fetchFn ?? globalThis.fetch)(
+  const response = await (config.fetchFn ?? window.fetch)(
     "https://api.openai.com/v1/chat/completions",
     {
       method: "POST",
@@ -58,7 +62,7 @@ async function summarizeWithOpenAi(
         messages: [
           {
             role: "user",
-            content: buildOpenAiPrompt(request)
+            content: buildProviderPrompt(request)
           }
         ]
       })
@@ -87,15 +91,6 @@ async function summarizeWithOpenAi(
       error
     );
   }
-}
-
-function buildOpenAiPrompt(request: ProviderRequest): string {
-  return [
-    request.promptContract.summaryPrompt,
-    request.promptContract.takeawaysPrompt,
-    "Page content:",
-    request.promptContract.noteBody
-  ].join("\n\n");
 }
 
 function extractGeneratedText(

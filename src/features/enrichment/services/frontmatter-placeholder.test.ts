@@ -5,9 +5,6 @@ import {
   DEFAULT_GENERATED_PLACEHOLDER,
   DEFAULT_PENDING_PLACEHOLDER,
   DEFAULT_SUMMARY_FRONTMATTER_KEY,
-  hasGeneratedSummaryPlaceholder,
-  hasNoneSummaryPlaceholder,
-  hasPendingSummaryPlaceholder,
   markSummaryPlaceholderAsGenerated,
   readSummaryPlaceholderState
 } from "./frontmatter-placeholder";
@@ -107,16 +104,16 @@ describe("explicit state helpers", () => {
       "Body"
     ].join("\n");
 
-    expect(hasNoneSummaryPlaceholder(noneNote)).toBe(true);
-    expect(hasNoneSummaryPlaceholder(pendingNote)).toBe(false);
-    expect(hasPendingSummaryPlaceholder(pendingNote)).toBe(true);
-    expect(hasPendingSummaryPlaceholder(generatedNote)).toBe(false);
-    expect(hasGeneratedSummaryPlaceholder(generatedNote)).toBe(true);
-    expect(hasGeneratedSummaryPlaceholder(noneNote)).toBe(false);
+    expect(readSummaryPlaceholderState(noneNote).isNone).toBe(true);
+    expect(readSummaryPlaceholderState(pendingNote).isNone).toBe(false);
+    expect(readSummaryPlaceholderState(pendingNote).isPending).toBe(true);
+    expect(readSummaryPlaceholderState(generatedNote).isPending).toBe(false);
+    expect(readSummaryPlaceholderState(generatedNote).isGenerated).toBe(true);
+    expect(readSummaryPlaceholderState(noneNote).isGenerated).toBe(false);
   });
 });
 
-describe("hasPendingSummaryPlaceholder", () => {
+describe("pending placeholder detection", () => {
   it("returns true only for pending notes", () => {
     const pendingNote = [
       "---",
@@ -133,8 +130,8 @@ describe("hasPendingSummaryPlaceholder", () => {
       "Body"
     ].join("\n");
 
-    expect(hasPendingSummaryPlaceholder(pendingNote)).toBe(true);
-    expect(hasPendingSummaryPlaceholder(generatedNote)).toBe(false);
+    expect(readSummaryPlaceholderState(pendingNote).isPending).toBe(true);
+    expect(readSummaryPlaceholderState(generatedNote).isPending).toBe(false);
   });
 });
 
