@@ -7,6 +7,16 @@ import {
 } from "../../enrichment/services/providers";
 import { formatProviderLabel } from "../services/plugin-settings";
 
+const SEARCHABLE_SETTINGS = [
+  { name: "Provider", desc: "Gemini or OpenAI." },
+  { name: "API key", desc: "Your provider API key, stored on this device." },
+  { name: "Model", desc: "The provider model used for summaries." },
+  { name: "Summary prompt", desc: "Wording of the summary instruction." },
+  { name: "Takeaways prompt", desc: "Wording of the key-takeaway instruction." },
+  { name: "Auto-process new notes", desc: "Summarize new pending notes automatically." },
+  { name: "Processing debounce (ms)", desc: "Delay before a new or changed note is processed." }
+];
+
 export class AiSummarySettingTab extends PluginSettingTab {
   private modelSettingRenderId = 0;
 
@@ -15,6 +25,11 @@ export class AiSummarySettingTab extends PluginSettingTab {
     private readonly plugin: ObsidianAiSummaryPlugin
   ) {
     super(app, plugin);
+  }
+
+  /** Obsidian 1.13+ settings search index; display() still renders the tab. */
+  getSettingDefinitions(): { name: string; desc: string }[] {
+    return SEARCHABLE_SETTINGS;
   }
 
   override display(): void {
