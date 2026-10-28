@@ -16,7 +16,7 @@ Built and maintained by [Lab829](https://lab829.com).
 
 ### Community Plugins
 
-Once the plugin is approved in the Obsidian Community Plugins directory, install it from `Settings -> Community plugins`.
+AI Summary is in the [Obsidian community plugins directory](https://community.obsidian.md/plugins/lab-ai-summary). In Obsidian, open `Settings -> Community plugins -> Browse`, search for `AI Summary`, then install and enable it.
 
 ### Manual install from GitHub releases
 
