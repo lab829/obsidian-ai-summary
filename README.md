@@ -46,6 +46,18 @@ Successful processing inserts the generated block below frontmatter and flips th
 
 If you want a note to stay untouched until later, use `ai_summary: none` and change it to `pending` when you want enrichment to start.
 
+## Use with Obsidian Web Clipper
+
+AI Summary works with the official [Obsidian Web Clipper](https://obsidian.md/clipper). Add one property to your clipper template, and every page you clip arrives as a pending note that the plugin summarizes.
+
+1. Install Obsidian Web Clipper for your browser (Chrome, Firefox, Safari, Edge and others) from [obsidian.md/clipper](https://obsidian.md/clipper). The setup is the same in every browser.
+2. Open the clipper's settings and select the template you use, for example `Default`.
+3. Under `Properties`, add a property named `ai_summary` with the value `pending`.
+4. Keep the template's behavior set to create a new note.
+5. Clip a page. Once the note is in your vault and Obsidian is open on desktop, AI Summary adds the summary and takeaways and sets the property to `generated`.
+
+Auto-process must stay on in the plugin settings. If Obsidian is closed when you clip, pending notes are processed the next time it starts.
+
 ## Disclosures
 
 ### Network use
